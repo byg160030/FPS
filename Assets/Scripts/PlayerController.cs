@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour
 
     public Animator anim;
 
+    public GameObject bullet;
+    public Transform firePoint;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -93,6 +96,28 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + mouseInput.x, transform.rotation.eulerAngles.z);
 
         camTrans.rotation = Quaternion.Euler(camTrans.rotation.eulerAngles + new Vector3(-mouseInput.y, 0f, 0f));
+
+
+        //Handle Shooting
+        if(Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit; 
+            if(Physics.Raycast(camTrans.position, camTrans.forward, out hit, 50f))
+            {
+                if(Vector3.Distance(camTrans.position, hit.point) > 2f)
+                { 
+                    firePoint.LookAt(hit.point);
+                }
+            } else
+            {
+                firePoint.LookAt(camTrans.position + (camTrans.forward * 30f));
+            }
+
+
+
+            Instantiate(bullet, firePoint.position, firePoint.rotation);
+        }
+
 
         anim.SetFloat("moveSpeed", moveInput.magnitude);
         anim.SetBool("onGround", canJump);
