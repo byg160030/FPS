@@ -54,128 +54,134 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //moveInput.x = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
-        //moveInput.z = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
-
-        //store y velocity
-        float yStore = moveInput.y;
-
-        Vector3 vertMove = transform.forward * Input.GetAxis("Vertical");
-        Vector3 horiMove = transform.right * Input.GetAxis("Horizontal");
-
-        moveInput = horiMove + vertMove;
-        moveInput.Normalize();
-
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (!UIController.instance.pauseScreen.activeInHierarchy)
         {
-            moveInput = moveInput * runSpeed;
-        }
-        else
-        {
-            moveInput = moveInput * moveSpeed;
-        }
+            //moveInput.x = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
+            //moveInput.z = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
 
-        moveInput.y = yStore;
+            //store y velocity
+            float yStore = moveInput.y;
 
-        moveInput.y += Physics.gravity.y * gravityModifier * Time.deltaTime;
+            Vector3 vertMove = transform.forward * Input.GetAxis("Vertical");
+            Vector3 horiMove = transform.right * Input.GetAxis("Horizontal");
 
-        if(charCon.isGrounded)
-        {
-            moveInput.y = Physics.gravity.y * gravityModifier * Time.deltaTime;
-        }
+            moveInput = horiMove + vertMove;
+            moveInput.Normalize();
 
-        canJump = Physics.OverlapSphere(groundCheckPoint.position, .25f, whatIsGround).Length > 0;
-
-        //Handle Jumping
-        if(Input.GetKeyDown(KeyCode.Space) && canJump)
-        {
-            moveInput.y = jumpPower;
-
-            canDoubleJump = true;
-        } else if(canDoubleJump && Input.GetKeyDown(KeyCode.Space))
-        {
-            moveInput.y = jumpPower;
-
-            canDoubleJump = false;
-        }
-
-        charCon.Move(moveInput * Time.deltaTime);
-
-        //control camera rotation
-        Vector2 mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensetivity;
-
-        if(invertX)
-        {
-            mouseInput.x = -mouseInput.x;
-        }
-
-        if (invertY)
-        {
-            mouseInput.y = -mouseInput.y;
-        }
-
-        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + mouseInput.x, transform.rotation.eulerAngles.z);
-
-        camTrans.rotation = Quaternion.Euler(camTrans.rotation.eulerAngles + new Vector3(-mouseInput.y, 0f, 0f));
-
-        muzzleFlash.SetActive(false);
-
-        //Handle Shooting
-        //single shots
-        if(Input.GetMouseButtonDown(0) && activeGun.fireCounter <= 0)
-        {
-            RaycastHit hit; 
-            if(Physics.Raycast(camTrans.position, camTrans.forward, out hit, 50f))
+            if (Input.GetKey(KeyCode.LeftShift))
             {
-                if(Vector3.Distance(camTrans.position, hit.point) > 2f)
-                { 
-                    firePoint.LookAt(hit.point);
-                }
-            } else
+                moveInput = moveInput * runSpeed;
+            }
+            else
             {
-                firePoint.LookAt(camTrans.position + (camTrans.forward * 30f));
+                moveInput = moveInput * moveSpeed;
             }
 
+            moveInput.y = yStore;
 
+            moveInput.y += Physics.gravity.y * gravityModifier * Time.deltaTime;
 
-            //Instantiate(bullet, firePoint.position, firePoint.rotation);
-            FireShot();
-        }
-
-        //repeating shots
-        if(Input.GetMouseButton(0) && activeGun.canAutoFire)
-        {
-            if(activeGun.fireCounter <= 0)
+            if (charCon.isGrounded)
             {
+                moveInput.y = Physics.gravity.y * gravityModifier * Time.deltaTime;
+            }
+
+            canJump = Physics.OverlapSphere(groundCheckPoint.position, .25f, whatIsGround).Length > 0;
+
+            //Handle Jumping
+            if (Input.GetKeyDown(KeyCode.Space) && canJump)
+            {
+                moveInput.y = jumpPower;
+
+                canDoubleJump = true;
+            }
+            else if (canDoubleJump && Input.GetKeyDown(KeyCode.Space))
+            {
+                moveInput.y = jumpPower;
+
+                canDoubleJump = false;
+            }
+
+            charCon.Move(moveInput * Time.deltaTime);
+
+            //control camera rotation
+            Vector2 mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensetivity;
+
+            if (invertX)
+            {
+                mouseInput.x = -mouseInput.x;
+            }
+
+            if (invertY)
+            {
+                mouseInput.y = -mouseInput.y;
+            }
+
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + mouseInput.x, transform.rotation.eulerAngles.z);
+
+            camTrans.rotation = Quaternion.Euler(camTrans.rotation.eulerAngles + new Vector3(-mouseInput.y, 0f, 0f));
+
+            muzzleFlash.SetActive(false);
+
+            //Handle Shooting
+            //single shots
+            if (Input.GetMouseButtonDown(0) && activeGun.fireCounter <= 0)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(camTrans.position, camTrans.forward, out hit, 50f))
+                {
+                    if (Vector3.Distance(camTrans.position, hit.point) > 2f)
+                    {
+                        firePoint.LookAt(hit.point);
+                    }
+                }
+                else
+                {
+                    firePoint.LookAt(camTrans.position + (camTrans.forward * 30f));
+                }
+
+
+
+                //Instantiate(bullet, firePoint.position, firePoint.rotation);
                 FireShot();
             }
-        }
 
-        if(Input.GetKeyDown(KeyCode.Tab))
-        {
-            SwitchGun();
-        }
+            //repeating shots
+            if (Input.GetMouseButton(0) && activeGun.canAutoFire)
+            {
+                if (activeGun.fireCounter <= 0)
+                {
+                    FireShot();
+                }
+            }
 
-        if(Input.GetMouseButtonDown(1))
-        {
-            CameraController.instance.ZoomIn(activeGun.zoomAmount);
-        }
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                SwitchGun();
+            }
 
-        if(Input.GetMouseButton(1))
-        {
-            gunHolder.position = Vector3.MoveTowards(gunHolder.position, adsPoint.position, adsSpeed * Time.deltaTime);
-        }else
-        {
-            gunHolder.localPosition = Vector3.MoveTowards(gunHolder.localPosition, gunStartPos, adsSpeed * Time.deltaTime);
-        }
+            if (Input.GetMouseButtonDown(1))
+            {
+                CameraController.instance.ZoomIn(activeGun.zoomAmount);
+            }
 
-        if(Input.GetMouseButtonUp(1))
-        {
-            CameraController.instance.ZoomOut();
-        }
+            if (Input.GetMouseButton(1))
+            {
+                gunHolder.position = Vector3.MoveTowards(gunHolder.position, adsPoint.position, adsSpeed * Time.deltaTime);
+            }
+            else
+            {
+                gunHolder.localPosition = Vector3.MoveTowards(gunHolder.localPosition, gunStartPos, adsSpeed * Time.deltaTime);
+            }
 
-        anim.SetFloat("moveSpeed", moveInput.magnitude);
-        anim.SetBool("onGround", canJump);
+            if (Input.GetMouseButtonUp(1))
+            {
+                CameraController.instance.ZoomOut();
+            }
+
+            anim.SetFloat("moveSpeed", moveInput.magnitude);
+            anim.SetBool("onGround", canJump);
+        }
     }
 
     public void FireShot()
