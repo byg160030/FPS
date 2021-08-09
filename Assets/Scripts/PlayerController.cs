@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!UIController.instance.pauseScreen.activeInHierarchy)
+        if (!UIController.instance.pauseScreen.activeInHierarchy && !GameManager.instance.LevelEnding)
         {
             //moveInput.x = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
             //moveInput.z = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
