@@ -45,7 +45,7 @@ public class PlayerHealthController : MonoBehaviour
 
             UIController.instance.ShowDamage();
 
-            if (currentHealth <= 0 && !GameManager.instance.LevelEnding)
+            if (currentHealth <= 0 && !GameManager.instance.levelEnding)
             {
                 gameObject.SetActive(false);
 
