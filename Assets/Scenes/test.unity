@@ -3173,7 +3173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76fe9d4f215bf2a4798eb8db03c5bf6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bullet: {fileID: 8973787262360464043, guid: 9927a13bbf06cbb46a123b981529a424, type: 3}
+  bullet: {fileID: 3862628559060395390, guid: 4e68d01c0206f324cbf046149caa784c, type: 3}
   rangeToTargetPlayer: 10
   timeBetweenShots: 0.5
   gun: {fileID: 1269067353}
