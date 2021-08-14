@@ -25,6 +25,9 @@ public class EnemyController : MonoBehaviour
 
     public Animator anim;
 
+    private bool wasShot;
+
+    // Start is called before the first frame update
     void Start()
     {
         startPoint = transform.position;
@@ -84,9 +87,15 @@ public class EnemyController : MonoBehaviour
 
             if (Vector3.Distance(transform.position, targetPoint) > distanceToLose)
             {
-                chasing = false;
+                if (!wasShot)
+                {
+                    chasing = false;
 
-                chaseCounter = keepChasingTime; ;
+                    chaseCounter = keepChasingTime; ;
+                }
+            }else
+            {
+                wasShot = false;
             }
 
             if (shotWaitCounter > 0)
@@ -144,5 +153,12 @@ public class EnemyController : MonoBehaviour
                 anim.SetBool("isMoving", false);
             }
         }
+    }
+
+    public void GetShot()
+    {
+        wasShot = true;
+
+        chasing = true;
     }
 }
